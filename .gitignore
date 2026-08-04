@@ -9,3 +9,9 @@ venv/
 # IDE
 .vscode/
 .idea/
+
+# Environment variables
+.env
+
+# Database
+*.db

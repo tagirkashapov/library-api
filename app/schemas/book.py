@@ -1,6 +1,8 @@
 from datetime import date
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import (
+    BaseModel, Field, field_validator, model_validator, ConfigDict
+)
 
 
 class BookBase(BaseModel):
@@ -16,7 +18,9 @@ class BookBase(BaseModel):
         if isinstance(v, str):
             cleaned = v.strip()
             if not cleaned:
-                raise ValueError("Field cannot be empty or contain only whitespace")
+                raise ValueError(
+                    "Field cannot be empty or contain only whitespace"
+                )
             return cleaned
         return v
     
@@ -25,14 +29,17 @@ class BookBase(BaseModel):
     def validate_isbn(cls, v: str) -> str:
         if not v.isdigit():
             raise ValueError("ISBN must contain only digits")
-        total = sum((3 if i % 2 else 1) * int(digit) for i, digit in enumerate(v[:12]))
+        total = sum(
+            (3 if i % 2 else 1) * int(digit) for i, digit in enumerate(v[:12])
+        )
         check_digit = (10 - (total % 10)) % 10
         if check_digit != int(v[12]):
             raise ValueError("Invalid ISBN-13 checksum")
         return v
     
-    model_config = {
-        "json_schema_extra": {
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
             "example": {
                 "title": "title",
                 "author": "author",
@@ -41,7 +48,7 @@ class BookBase(BaseModel):
                 "isbn": "9785948242736"
             }
         }
-    }
+    )
 
 
 class BookResponse(BookBase):
@@ -56,7 +63,9 @@ class BookUpdate(BookBase):
     title: str | None = Field(None, min_length=1, max_length=128)
     author: str | None = Field(None, min_length=1, max_length=128)
     publisher: str | None = Field(None, min_length=1, max_length=128)
-    publication_date: date | None = Field(None, ge=date(1970, 1, 1), le=date.today())
+    publication_date: date | None = Field(
+        None, ge=date(1970, 1, 1), le=date.today()
+    )
     isbn: str | None = Field(None, min_length=13, max_length=13)
     
     @model_validator(mode="after")
