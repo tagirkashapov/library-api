@@ -1,17 +1,18 @@
-from contextlib import asynccontextmanager
-
 from fastapi import FastAPI
 
-from app.db.db import engine
-from app.db.base import Base
-from app.api.books import router as book_router
+from app.models import *
+from app.schemas import (
+    BookResponse, BookDetailResponse, AuthorResponse, PublisherResponse
+)
+from app.api.routers import *
 
+BookResponse.model_rebuild()
+BookDetailResponse.model_rebuild()
+AuthorResponse.model_rebuild()
+PublisherResponse.model_rebuild()
 
-@asynccontextmanager
-async def lifespan(_: FastAPI):
-    Base.metadata.create_all(bind=engine)
-    yield
+app = FastAPI()
 
-
-app = FastAPI(lifespan=lifespan)
 app.include_router(book_router)
+app.include_router(author_router)
+app.include_router(publisher_router)

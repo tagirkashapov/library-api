@@ -1,18 +1,21 @@
+from typing import TYPE_CHECKING
 from datetime import date
 
 from pydantic import (
     BaseModel, Field, field_validator, model_validator, ConfigDict
 )
 
+if TYPE_CHECKING:
+    from app.schemas import AuthorResponse
+    from app.schemas import PublisherResponse
+
 
 class BookBase(BaseModel):
     title: str = Field(min_length=1, max_length=128)
-    author: str = Field(min_length=1, max_length=128)
-    publisher: str = Field(min_length=1, max_length=128)
-    publication_date: date = Field(ge=date(1970, 1, 1), le=date.today())
+    publish_date: date = Field(ge=date(1970, 1, 1), le=date.today())
     isbn: str = Field(min_length=13, max_length=13)
 
-    @field_validator("title", "author", "publisher", "isbn", mode="before")
+    @field_validator("title", "isbn", mode="before")
     @classmethod
     def clean_string(cls, v: str | None) -> str | None:
         if isinstance(v, str):
@@ -26,7 +29,9 @@ class BookBase(BaseModel):
     
     @field_validator("isbn")
     @classmethod
-    def validate_isbn(cls, v: str) -> str:
+    def validate_isbn(cls, v: str | None) -> str | None:
+        if v is None:
+            return None
         if not v.isdigit():
             raise ValueError("ISBN must contain only digits")
         total = sum(
@@ -42,10 +47,10 @@ class BookBase(BaseModel):
         json_schema_extra={
             "example": {
                 "title": "title",
-                "author": "author",
-                "publisher": "publisher",
-                "publication_date": "2000-01-01",
-                "isbn": "9785948242736"
+                "publish_date": "2000-01-01",
+                "isbn": "9785948242736",
+                "publisher_id": 1,
+                "author_ids": [1, 2]
             }
         }
     )
@@ -55,21 +60,28 @@ class BookResponse(BookBase):
     id: int = Field(ge=1)
 
 
+class BookDetailResponse(BookBase):
+    id: int = Field(ge=1)
+    authors: list["AuthorResponse"]
+    publisher: "PublisherResponse"
+
+
 class BookCreate(BookBase):
-    pass
+    publisher_id: int
+    author_ids: list[int]
 
 
 class BookUpdate(BookBase):
     title: str | None = Field(None, min_length=1, max_length=128)
-    author: str | None = Field(None, min_length=1, max_length=128)
-    publisher: str | None = Field(None, min_length=1, max_length=128)
-    publication_date: date | None = Field(
+    publish_date: date | None = Field(
         None, ge=date(1970, 1, 1), le=date.today()
     )
     isbn: str | None = Field(None, min_length=13, max_length=13)
+    publisher_id: int | None = None
+    author_ids: list[int] | None = None
     
     @model_validator(mode="after")
     def validate_at_least_one_field(self) -> "BookUpdate":
-        if all(value is None for value in self.__dict__.values()):
+        if not self.model_dump(exclude_unset=True):
             raise ValueError("At least one field must be provided for update")
         return self
