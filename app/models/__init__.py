@@ -1,3 +1,4 @@
 from app.models.publisher import Publisher
+from app.models.author import Author
 
-__all__ = ["Publisher"]
+__all__ = ["Publisher", "Author"]
