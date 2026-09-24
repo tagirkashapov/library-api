@@ -1,4 +1,9 @@
 from app.schemas.publisher import (
-    PublisherResponse, PublisherCreate, PublisherUpdate
+    PublisherResponse, PublisherShortResponse, PublisherCreate, PublisherUpdate
 )
-from app.schemas.author import AuthorResponse, AuthorCreate, AuthorUpdate
+from app.schemas.author import (
+    AuthorResponse, AuthorShortResponse, AuthorCreate, AuthorUpdate
+)
+from app.schemas.book import (
+    BookResponse, BookDetailResponse, BookCreate, BookUpdate
+)

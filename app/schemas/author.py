@@ -19,6 +19,10 @@ class AuthorResponse(AuthorBase):
     updated_at: datetime
 
 
+class AuthorShortResponse(AuthorBase):
+    id: int = Field(ge=1)
+
+
 class AuthorCreate(AuthorBase):
     pass
 
