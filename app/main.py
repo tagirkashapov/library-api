@@ -15,6 +15,7 @@ app = FastAPI()
 
 app.include_router(publishers_router)
 app.include_router(authors_router)
+app.include_router(books_router)
 
 
 @app.middleware("http")
