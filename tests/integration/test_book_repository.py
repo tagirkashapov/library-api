@@ -36,14 +36,14 @@ def create_data():
     return [
         BookCreate(
             title="Book One",
-            publication_date=date(2001, 1, 1),
+            publication_year=2001,
             isbn="9785948242736",
             publisher_id=1,
             author_ids=[1, 2]
         ),
         BookCreate(
             title="Book Two",
-            publication_date=date(2002, 2, 2),
+            publication_year=2002,
             isbn="9785041002237",
             publisher_id=2,
             author_ids=[1, 3]
@@ -55,7 +55,7 @@ def create_data():
 def update_data():
     return BookUpdate(
         title="Book Three",
-        publication_date=date(2003, 3, 3),
+        publication_year=2003,
         isbn="9783161484100",
         publisher_id=3,
         author_ids=[2, 3]
@@ -74,7 +74,7 @@ async def test_create_success(
     assert created.created_at is not None
     assert created.updated_at is not None
     assert created.title == create_data[0].title
-    assert created.publication_date == create_data[0].publication_date
+    assert created.publication_year == create_data[0].publication_year
     assert created.isbn == create_data[0].isbn
     assert created.publisher_id == create_data[0].publisher_id
 
