@@ -19,6 +19,10 @@ class PublisherResponse(PublisherBase):
     updated_at: datetime
 
 
+class PublisherShortResponse(PublisherBase):
+    id: int = Field(ge=1)
+
+
 class PublisherCreate(PublisherBase):
     pass
 
